@@ -65,7 +65,10 @@ struct SteamSystem final : ISystem {
 	}
 
 	void update(float) override {
-		if (m_initialized) SteamAPI_RunCallbacks();
+		if (!m_initialized) return;
+		SteamAPI_RunCallbacks();
+		// Steam syncs stats before the process starts, so UserStatsReceived_t is not guaranteed to arrive; a loaded schema is enough
+		if (!m_stats_ready && SteamUserStats()->GetNumAchievements() > 0) m_stats_ready = true;
 	}
 
 	void init() {
