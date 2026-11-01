@@ -1,0 +1,24 @@
+// import "steam:steam"
+//
+// Needs the steam plugin (plugins/steam), which initializes Steam on engine startup.
+// Without Steam running, isInitialized() returns false and everything else is a no-op.
+
+extern fn isInitialized() : bool;
+extern fn getUserName() : []const u8;
+extern fn getAppId() : i32;
+
+// Achievements and stats work after Steam delivers them, shortly after startup. Until then they log a warning and return false/0.
+// Other failures, such as an unknown name or a wrong stat type, log an error and return false/0.
+extern fn isStatsReady() : bool;
+extern fn setAchievement(name : []const u8) : bool;
+extern fn clearAchievement(name : []const u8) : bool;
+extern fn getAchievement(name : []const u8) : bool;
+extern fn setStatInt(name : []const u8, value : i32) : bool;
+extern fn getStatInt(name : []const u8) : i32;
+extern fn setStatFloat(name : []const u8, value : f32) : bool;
+extern fn getStatFloat(name : []const u8) : f32;
+// Uploads changed stats and achievements. Returns true if the upload is queued, a failed upload is logged later.
+extern fn storeStats() : bool;
+
+extern fn setRichPresence(key : []const u8, value : []const u8) : bool;
+extern fn clearRichPresence() : void;
