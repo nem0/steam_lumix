@@ -97,7 +97,7 @@ struct SteamSystem final : ISystem {
 	void onUserStatsReceived(UserStatsReceived_t* data) {
 		if (data->m_nGameID != SteamUtils()->GetAppID()) return;
 		if (data->m_eResult != k_EResultOK) {
-			logError("steam: failed to receive user stats, result ", (i32)data->m_eResult);
+			logError("steam: failed to receive user stats, result ", (i32)data->m_eResult, " (", resultText(data->m_eResult), "), app ", (i32)SteamUtils()->GetAppID());
 			return;
 		}
 		m_stats_ready = true;
@@ -106,7 +106,21 @@ struct SteamSystem final : ISystem {
 	// StoreStats only queues the upload, its result is delivered here
 	void onUserStatsStored(UserStatsStored_t* data) {
 		if (data->m_nGameID != SteamUtils()->GetAppID()) return;
-		if (data->m_eResult != k_EResultOK) logError("steam: failed to store user stats, result ", (i32)data->m_eResult);
+		if (data->m_eResult != k_EResultOK) logError("steam: failed to store user stats, result ", (i32)data->m_eResult, " (", resultText(data->m_eResult), "), app ", (i32)SteamUtils()->GetAppID());
+	}
+
+	static const char* resultText(EResult r) {
+		switch (r) {
+			case k_EResultFail: return "generic failure";
+			case k_EResultNoConnection: return "no connection to Steam servers: Steam is offline, or the account has no access to this app";
+			case k_EResultInvalidParam: return "invalid parameter";
+			case k_EResultAccessDenied: return "access denied: the account may not play this app";
+			case k_EResultTimeout: return "timed out";
+			case k_EResultServiceUnavailable: return "Steam service unavailable";
+			case k_EResultNotLoggedOn: return "not logged on to Steam";
+			case k_EResultRateLimitExceeded: return "rate limit exceeded";
+			default: return "see EResult in the Steamworks docs";
+		}
 	}
 
 	// Script strings are not null terminated.
